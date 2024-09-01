@@ -1,0 +1,13 @@
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/TesteDesenvolvedorBackendApplication.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/controller/TaskController.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/controller/UserController.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/dto/UserDTO.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/entity/Task.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/entity/Users.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/enums/Level.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/enums/Status.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/exception/EntityNotFoundException.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/repository/TaskRepository.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/repository/UserRepository.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/service/TaskService.java
+/home/gilvaneamaro/Documentos/Github/MeuNovoEmprego/backend-java-spring-test/src/main/java/com/teste/selaz/service/UserService.java
