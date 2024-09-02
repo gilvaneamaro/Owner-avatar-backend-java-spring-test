@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.teste.selaz.TesteDesenvolvedorBackendApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.718 s -- in com.teste.selaz.TesteDesenvolvedorBackendApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.223 s -- in com.teste.selaz.TesteDesenvolvedorBackendApplicationTests

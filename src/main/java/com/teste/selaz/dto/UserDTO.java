@@ -1,4 +1,6 @@
 package com.teste.selaz.dto;
 
-public record UserDTO( String username, String nivel) {
+import com.teste.selaz.enums.Role;
+
+public record UserDTO(Long id, String username, Role role) {
 }

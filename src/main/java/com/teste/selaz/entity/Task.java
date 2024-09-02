@@ -25,7 +25,7 @@ public class Task {
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne
-    private Users user;
+    private User user;
 
     public Task(String title, String description, LocalDateTime dueDate, Status status) {
         this.title = title;
