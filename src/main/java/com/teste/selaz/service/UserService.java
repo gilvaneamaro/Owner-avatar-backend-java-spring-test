@@ -5,6 +5,7 @@ import com.teste.selaz.dto.UserDTO;
 import com.teste.selaz.entity.Task;
 import com.teste.selaz.entity.User;
 import com.teste.selaz.exception.EntityNotFoundException;
+import com.teste.selaz.exception.UserAlreadyExistsException;
 import com.teste.selaz.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.transaction.Transactional;
@@ -32,7 +33,7 @@ public class UserService {
             notNull(user, "User must not be null");
 
             if(this.userRepository.findByUsername(user.username()) != null)
-                throw new EntityExistsException("Username already exists");
+                throw new UserAlreadyExistsException("Username already exists");
 
             String encryptedPassword =  new BCryptPasswordEncoder().encode(user.password());
             User newUser = new User(user.username(), encryptedPassword, user.role());

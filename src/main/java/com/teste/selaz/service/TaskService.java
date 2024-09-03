@@ -27,7 +27,7 @@ public class TaskService {
     @Transactional
     public TaskDTO createTask(Task task) {
         Task newTask = taskRepository.save(task);
-        TaskDTO dto = new TaskDTO(
+         return new TaskDTO(
                 newTask.getId(),
                 newTask.getTitle(),
                 newTask.getDescription(),
@@ -35,8 +35,6 @@ public class TaskService {
                 newTask.getStatus(),
                 newTask.getUser().getId()
         );
-
-        return dto;
     }
 //Long id, String title, String description, String dueDate, Status status, Long userID
     @Transactional
@@ -102,5 +100,4 @@ public class TaskService {
     public List<Task> loadTasksByUserId(Long userID) {
         return taskRepository.findTaskByUserId(userID);
     }
-
 }
