@@ -7,15 +7,20 @@ import com.teste.selaz.entity.User;
 import com.teste.selaz.enums.Role;
 import com.teste.selaz.exception.EntityNotFoundException;
 import com.teste.selaz.exception.UserAlreadyExistsException;
+import com.teste.selaz.repository.TaskRepository;
 import com.teste.selaz.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Optional;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,6 +36,9 @@ public class UserServiceTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    TaskService taskService;
+
     private UserDTO userDTO;
 
     private RegisterDTO registerDTO;
@@ -41,11 +49,9 @@ public class UserServiceTest {
     void setUp(){
         MockitoAnnotations.openMocks(this);
 
-        // Configura os objetos usados nos testes
         registerDTO = new RegisterDTO("gilvaneamaro", "123456", Role.ADMIN);
-        // Configura um User com um id fictício e dados necessários
         user = new User("gilvaneamaro", new BCryptPasswordEncoder().encode("123456"), Role.ADMIN);
-        user.setId(1L);  // Certifica-se de que o User tem um ID
+        user.setId(1L);
         userDTO = new UserDTO(1L, "gilvaneamaro", Role.ADMIN);
 
     }
@@ -87,6 +93,21 @@ public class UserServiceTest {
     }
 
     @Test
+    void shouldDeleteUserSuccessfully() {
+        Long userId = 1L;
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        doNothing().when(userRepository).delete(user);
+
+        String result = userService.deleteUser(userId);
+
+        assertEquals("User deleted", result);
+        verify(userRepository).findById(userId);
+        verify(userRepository).delete(user);
+    }
+
+
+    @Test
     void shouldThrowExceptionWhenUsernameAlreadyExists() {
         when(userRepository.findByUsername(registerDTO.username())).thenReturn(user);
 
@@ -98,4 +119,32 @@ public class UserServiceTest {
 
         verify(userRepository, never()).save(any(User.class));
     }
+    @Test
+    void shouldUpdateUserSuccessfully() {
+        Long userId = 1L;
+
+        User updatedUser = new User();
+        updatedUser.setUsername("newUsername");
+        updatedUser.setPassword("newPassword123");
+        updatedUser.setRole(Role.USER);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        UserDTO result = userService.updateUser(userId, updatedUser);
+
+        verify(userRepository).findById(userId);
+        verify(userRepository).save(any(User.class));
+
+        assertEquals("newUsername", result.username());
+        assertEquals(Role.USER, result.role());
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
+        User capturedUser = userCaptor.getValue();
+
+        assertTrue(new BCryptPasswordEncoder().matches("newPassword123", capturedUser.getPassword()));
+    }
+
+
 }

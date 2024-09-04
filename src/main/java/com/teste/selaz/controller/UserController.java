@@ -11,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/users")
 @CrossOrigin
+@Slf4j
 public class UserController {
     @Autowired
     UserService usuarioService;
@@ -105,7 +108,7 @@ public class UserController {
             }
     )
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthenticationDTO data) {
+    public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(usuarioService.login(data));
         }
@@ -125,8 +128,9 @@ public class UserController {
             }
     )
     @PostMapping
-    public ResponseEntity<UserDTO> register(@RequestBody RegisterDTO user) {
+    public ResponseEntity<UserDTO> register(@RequestBody @Valid RegisterDTO user) {
         try {
+
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.createUser(user));
         }
         catch (Exception e) {
@@ -146,7 +150,7 @@ public class UserController {
             }
     )
     @GetMapping(value = "/{userId}/tasks")
-    public ResponseEntity<List<TaskDTO>> loadTasksByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<TaskDTO>> loadTasksByUser(@PathVariable @Valid Long userId) {
         try {
             UserDTO userDTO = userService.findByID(userId);
             return ResponseEntity.ok().body(taskService.listTasks(userId));

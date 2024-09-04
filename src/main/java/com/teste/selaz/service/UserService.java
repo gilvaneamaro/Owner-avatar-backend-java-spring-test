@@ -61,7 +61,7 @@ public class UserService {
         }
         return userDTOList;
     }
-
+/*
     @Transactional
     public UserDTO updateUser(Long id, User updatedUser) {
         User user = userRepository.findById(id)
@@ -75,8 +75,25 @@ public class UserService {
             user.setPassword(new BCryptPasswordEncoder().encode(updatedUser.getPassword()));
         }
         return user.toDTO(user);
-    }
+    }*/
+    @Transactional
+    public UserDTO updateUser(Long id, User updatedUser) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
 
+        if (updatedUser.getUsername() != null && !updatedUser.getUsername().equals(user.getUsername())) {
+            user.setUsername(updatedUser.getUsername());
+        }
+        if (updatedUser.getRole() != null && !updatedUser.getRole().equals(user.getRole())) {
+            user.setRole(updatedUser.getRole());
+        }
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().equals(user.getPassword())) {
+            user.setPassword(new BCryptPasswordEncoder().encode(updatedUser.getPassword()));
+        }
+
+        userRepository.save(user);
+        return user.toDTO(user);
+    }
 
     @Transactional
     public String deleteUser(Long id) {
@@ -115,5 +132,9 @@ public class UserService {
     public User findUserByID(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+    }
+
+    public UserDTO updatePassword(Long userId, String newPassword) {
+        return null;
     }
 }
