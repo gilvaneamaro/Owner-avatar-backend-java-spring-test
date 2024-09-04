@@ -1,13 +1,18 @@
 package com.teste.selaz.service;
 
+import com.teste.selaz.dto.TaskCreateDTO;
 import com.teste.selaz.dto.TaskDTO;
 import com.teste.selaz.entity.Task;
+import com.teste.selaz.entity.User;
 import com.teste.selaz.enums.Status;
 import com.teste.selaz.exception.EntityNotFoundException;
+import com.teste.selaz.exception.InvalidDueDateException;
 import com.teste.selaz.repository.TaskRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +23,16 @@ public class TaskService {
     private TaskRepository taskRepository;
 
     @Transactional
-    public TaskDTO createTask(Task task) {
-        try {
-            Task newTask = taskRepository.save(task);
+    public TaskDTO createTask(TaskCreateDTO task, User user) {
+        if (task.dueDate().isBefore(LocalDateTime.now()))
+            throw new InvalidDueDateException("Task due date is less than now");
 
-            return task.toDTO(task);
-        }
-        catch (Exception e) {
-            throw new EntityNotFoundException("Error creating task");
-        }
+        Task newTask = task.toTask(task);
+        newTask.setUser(user);
+        newTask.setCreateAt(LocalDateTime.now());
+        taskRepository.save(newTask);
+
+        return newTask.toDTO(newTask);
     }
     @Transactional
     public TaskDTO updateTask(Long id, Task task) {

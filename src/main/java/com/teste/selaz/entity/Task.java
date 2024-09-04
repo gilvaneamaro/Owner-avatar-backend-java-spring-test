@@ -39,6 +39,7 @@ public class Task {
         return new TaskDTO( task.getId(),
                             task.getTitle(),
                             task.getDescription(),
+                            task.getCreateAt(),
                             task.getDueDate(),
                             task.getStatus(),
                             task.getUser().getId());

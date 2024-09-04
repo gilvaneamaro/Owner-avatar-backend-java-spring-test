@@ -1,10 +1,13 @@
 package com.teste.selaz.controller;
 
+import com.teste.selaz.dto.TaskCreateDTO;
 import com.teste.selaz.dto.TaskDTO;
 import com.teste.selaz.dto.UserDTO;
 import com.teste.selaz.entity.Task;
+import com.teste.selaz.entity.User;
 import com.teste.selaz.enums.Status;
 import com.teste.selaz.exception.EntityNotFoundException;
+import com.teste.selaz.exception.InvalidDueDateException;
 import com.teste.selaz.service.TaskService;
 import com.teste.selaz.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +43,7 @@ public class TaskController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Task encontradas com sucesso.",
                             content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = TaskDTO.class)))),
-                    @ApiResponse(responseCode = "403", description = "Usuário não autenticado.",
+                    @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.",
                             content = @Content(mediaType = "application/json")),
             }
     )
@@ -63,10 +66,10 @@ public class TaskController {
             if (status.equals(Status.CONCLUIDA) || status.equals(Status.PENDENTE) || status.equals(Status.EM_ANDAMENTO)) {
                 return ResponseEntity.ok().body(taskService.loadTasksByStatus(userId, status));
             }
-            return ResponseEntity.badRequest().build();
+            throw new InvalidDueDateException("Due date invalido");
         }
         catch (Exception e){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -75,19 +78,27 @@ public class TaskController {
             description = "Recebe um objeto Task, caso o id do usuário na task seja válido, retorna um TaskDTO.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Task criada com sucesso.",
-                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
-                    @ApiResponse(responseCode = "400", description = "Usuário não cadastrado.",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = TaskDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Usuário não cadastrado.",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "400", description = "Data de vencimento não pode ser antes da data atual.",
                             content = @Content(mediaType = "application/json")),
             }
     )
     @PostMapping
-    public ResponseEntity<TaskDTO> createTask(@RequestBody Task task) {
+    public ResponseEntity<TaskDTO> createTask(@RequestBody TaskCreateDTO task) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(task));
+            User user =userService.findUserByID(task.userID());
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(task, user));
         }
-        catch (Exception e){
-            return ResponseEntity.badRequest().build();
+        catch (EntityNotFoundException e){
+            return ResponseEntity.notFound().build();
         }
+        catch (InvalidDueDateException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
     }
 
     @Operation(
