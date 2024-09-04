@@ -44,7 +44,7 @@ Desenvolver uma aplicação de gerenciamento de tarefas (todo list) com as segui
 
 ### 1. Clone o repositório e acesse o diretório:
    ```
-   git clone https://github.com/ManagerThalles/backend-java-spring-test.git
+   git clone https://github.com/gilvaneamaro/backend-java-spring-test.git
    cd backend-java-spring-boot-test
    ```
 
