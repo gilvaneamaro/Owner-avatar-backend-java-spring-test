@@ -91,7 +91,9 @@ public class TaskService {
     }
 
     public List<TaskDTO> listTasks(Long userID) {
+
         List<Task> taskList = taskRepository.findTaskByUserId(userID);
+
 
         List<TaskDTO> taskDTOList = new ArrayList<>();
         for(Task task: taskList){

@@ -1,21 +1,26 @@
 package com.teste.selaz.service;
 
-import com.teste.selaz.dto.RegisterDTO;
-import com.teste.selaz.dto.TaskDTO;
-import com.teste.selaz.dto.UserDTO;
+import com.teste.selaz.dto.*;
 import com.teste.selaz.entity.Task;
 import com.teste.selaz.entity.User;
 import com.teste.selaz.exception.EntityNotFoundException;
 import com.teste.selaz.exception.UserAlreadyExistsException;
 import com.teste.selaz.repository.UserRepository;
+import com.teste.selaz.security.TokenService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.springframework.util.Assert.notNull;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class UserService {
@@ -24,6 +29,12 @@ public class UserService {
 
     @Autowired
     TaskService taskService;
+
+    @Autowired
+    TokenService tokenService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     public UserDTO createUser(RegisterDTO user) {
         try {
@@ -68,12 +79,13 @@ public class UserService {
 
 
     @Transactional
-    public void deleteUser(Long id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            taskService.deleteTasksByUserID(user.get().getId());
-            userRepository.delete(user.get());
-        }
+    public String deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        taskService.deleteTasksByUserID(user.getId());
+        userRepository.delete(user);
+        return "User deleted";
     }
 
     public Long findIdByUsername(String username) {
@@ -84,5 +96,19 @@ public class UserService {
         } catch (final Exception e) {
             throw new EntityNotFoundException("User not found with username: " + username, e);
         }
+    }
+
+    public LoginResponseDTO login (AuthenticationDTO data){
+            var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
+            var auth = this.authenticationManager.authenticate(usernamePassword);
+            var token = tokenService.generateToken((User) auth.getPrincipal());
+
+            return new LoginResponseDTO(token);
+    }
+
+    public UserDTO findByID(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        return user.toDTO(user);
     }
 }
