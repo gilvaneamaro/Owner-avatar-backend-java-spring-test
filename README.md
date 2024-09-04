@@ -48,7 +48,12 @@ Desenvolver uma aplicação de gerenciamento de tarefas (todo list) com as segui
    cd backend-java-spring-boot-test
    ```
 
-### 2. Execute o comando:
+### 2. Execute o comando para compilar e executar os testes unitários:
+Compilando:
+```
+mvn clean install
+```
+Iniciando projeto:
    ```
    mvn spring-boot:run
    ```
