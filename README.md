@@ -43,10 +43,13 @@ Desenvolver uma aplicação de gerenciamento de tarefas (todo list) com as segui
 ### Após iniciar o projeto, documentação dos endpoints pelo Swagger estará disponível pelo [link](http://localhost:8080/swagger-ui/index.html):
 
 ### 1. Clone o repositório e acesse o diretório:
-   ```
-   git clone https://github.com/gilvaneamaro/backend-java-spring-test.git
-   cd backend-java-spring-boot-test
-   ```
+```
+git clone https://github.com/gilvaneamaro/backend-java-spring-test.git
+```
+Acesse o diretório
+```
+cd backend-java-spring-boot-test
+```
 
 ### 2. Execute o comando para compilar e executar os testes unitários:
 Compilando:
