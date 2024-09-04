@@ -30,35 +30,32 @@ public class TaskService {
     }
     @Transactional
     public TaskDTO updateTask(Long id, Task task) {
-        Optional<Task> taskOptional = taskRepository.findById(id);
+        Task existingTask = taskRepository.findById(id)
+                .orElseThrow( () -> new EntityNotFoundException("Task not found"));
 
-        if (taskOptional.isPresent()) {
-            Task existingTask = taskOptional.get();
+        if (task.getTitle() != null) {
+            existingTask.setTitle(task.getTitle());
+        }
+        if (task.getDescription() != null) {
+            existingTask.setDescription(task.getDescription());
+        }
+        if (task.getDueDate() != null) {
+            existingTask.setDueDate(task.getDueDate());
+        }
+        if (task.getStatus() != null) {
+            existingTask.setStatus(task.getStatus());
 
-            if (task.getTitle() != null) {
-                existingTask.setTitle(task.getTitle());
-            }
-            if (task.getDescription() != null) {
-                existingTask.setDescription(task.getDescription());
-            }
-            if (task.getDueDate() != null) {
-                existingTask.setDueDate(task.getDueDate());
-            }
-            if (task.getStatus() != null) {
-                existingTask.setStatus(task.getStatus());
-            }
             return existingTask.toDTO(existingTask);
         }
         throw new EntityNotFoundException("Task with id " + id + " not found.");
     }
 
     public String deleteTask(Long id) {
-        Optional<Task> taskOptional = taskRepository.findById(id);
-        if(taskOptional.isPresent()) {
-            taskRepository.delete(taskOptional.get());
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+
+            taskRepository.delete(task);
             return "Task deleted";
-        }
-        throw new EntityNotFoundException("Task not found");
     }
 
     @Transactional
@@ -93,8 +90,6 @@ public class TaskService {
     public List<TaskDTO> listTasks(Long userID) {
 
         List<Task> taskList = taskRepository.findTaskByUserId(userID);
-
-
         List<TaskDTO> taskDTOList = new ArrayList<>();
         for(Task task: taskList){
             taskDTOList.add( task.toDTO(task) );
