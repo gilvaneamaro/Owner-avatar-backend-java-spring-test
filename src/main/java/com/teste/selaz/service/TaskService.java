@@ -5,11 +5,9 @@ import com.teste.selaz.entity.Task;
 import com.teste.selaz.enums.Status;
 import com.teste.selaz.exception.EntityNotFoundException;
 import com.teste.selaz.repository.TaskRepository;
-import com.teste.selaz.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -19,36 +17,39 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public List<Task> listTasks(Long userId) {
-
-        return taskRepository.findTaskByUserId(userId);
-    }
-
     @Transactional
     public TaskDTO createTask(Task task) {
-        Task newTask = taskRepository.save(task);
-         return new TaskDTO(
-                newTask.getId(),
-                newTask.getTitle(),
-                newTask.getDescription(),
-                newTask.getDueDate(),
-                newTask.getStatus(),
-                newTask.getUser().getId()
-        );
+        try {
+            Task newTask = taskRepository.save(task);
+
+            return task.toDTO(task);
+        }
+        catch (Exception e) {
+            throw new EntityNotFoundException("Error creating task");
+        }
     }
-//Long id, String title, String description, String dueDate, Status status, Long userID
     @Transactional
-    public Task updateTask(Long id, Task task) {
+    public TaskDTO updateTask(Long id, Task task) {
         Optional<Task> taskOptional = taskRepository.findById(id);
 
         if (taskOptional.isPresent()) {
-           taskOptional.get().setTitle(task.getTitle());
-           taskOptional.get().setDescription(task.getDescription());
-           taskOptional.get().setDueDate(task.getDueDate());
-           taskOptional.get().setStatus(task.getStatus());
-           return taskOptional.get();
+            Task existingTask = taskOptional.get();
+
+            if (task.getTitle() != null) {
+                existingTask.setTitle(task.getTitle());
+            }
+            if (task.getDescription() != null) {
+                existingTask.setDescription(task.getDescription());
+            }
+            if (task.getDueDate() != null) {
+                existingTask.setDueDate(task.getDueDate());
+            }
+            if (task.getStatus() != null) {
+                existingTask.setStatus(task.getStatus());
+            }
+            return existingTask.toDTO(existingTask);
         }
-        return null;
+        throw new EntityNotFoundException("Task with id " + id + " not found.");
     }
 
     public String deleteTask(Long id) {
@@ -62,42 +63,40 @@ public class TaskService {
 
     @Transactional
     public void deleteTasksByUserID(Long userId) {
-
         List<Task> taskList = taskRepository.findTaskByUserId(userId);
-
-        if(taskList.isEmpty()) {
-            throw new EntityNotFoundException("Task not found");
-        }
         taskRepository.deleteAll(taskList);
 
     }
-    @Transactional
-    public Task loadTaskById(Long id) {
-        Optional<Task> taskOptional = taskRepository.findById(id);
-        if(taskOptional.isPresent()) {
-            return taskOptional.get();
-        }
-        throw new EntityNotFoundException("Task not found");
-    }
 
-    public List<Task> loadTasksByStatus(Long userID, Status status) {
-        List<Task> taskList = listTasks(userID);
-        List<Task> taskListByStatus = new ArrayList<>();
-        for(Task task: taskList){
-            if (task.getStatus().equals(status)){
+    public List<TaskDTO> loadTasksByStatus(Long userID, Status status) {
+        List<TaskDTO> taskList = listTasks(userID);
+        List<TaskDTO> taskListByStatus = new ArrayList<>();
+
+        for(TaskDTO task: taskList){
+            if (task.status().equals(status)){
                 taskListByStatus.add(task);
             }
         }
         return taskListByStatus;
     }
 
-    public List<Task> loadTasksByDueDate(Long userID) {
+    public List<TaskDTO> loadTasksByDueDate(Long userID) {
+        List<TaskDTO> taskListDTO = new ArrayList<>();
         List<Task> taskList = taskRepository.findAllTasksOrderedByDueDate(userID);
 
-        return taskList;
+       for(Task task: taskList){
+            taskListDTO.add(task.toDTO(task));
+        }
+        return taskListDTO;
     }
 
-    public List<Task> loadTasksByUserId(Long userID) {
-        return taskRepository.findTaskByUserId(userID);
+    public List<TaskDTO> listTasks(Long userID) {
+        List<Task> taskList = taskRepository.findTaskByUserId(userID);
+
+        List<TaskDTO> taskDTOList = new ArrayList<>();
+        for(Task task: taskList){
+            taskDTOList.add( task.toDTO(task) );
+        }
+        return taskDTOList;
     }
 }

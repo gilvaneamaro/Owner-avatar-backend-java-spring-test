@@ -1,9 +1,6 @@
 package com.teste.selaz.controller;
 
-import com.teste.selaz.dto.AuthenticationDTO;
-import com.teste.selaz.dto.LoginResponseDTO;
-import com.teste.selaz.dto.RegisterDTO;
-import com.teste.selaz.dto.UserDTO;
+import com.teste.selaz.dto.*;
 import com.teste.selaz.entity.User;
 import com.teste.selaz.repository.UserRepository;
 import com.teste.selaz.security.TokenService;
@@ -14,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,22 +41,27 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) throws Exception {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) throws Exception {
             return ResponseEntity.status(HttpStatus.OK).body(usuarioService.updateUser(id, user));
     }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(usuarioService.deleteUser(id));
+        usuarioService.deleteUser(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody AuthenticationDTO data) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-        var token = tokenService.generateToken((User) auth.getPrincipal());
+        try {
+            var usernamePassword = new UsernamePasswordAuthenticationToken(data.username(), data.password());
+            var auth = this.authenticationManager.authenticate(usernamePassword);
+            var token = tokenService.generateToken((User) auth.getPrincipal());
 
-        return ResponseEntity.ok(new LoginResponseDTO(token));
+            return ResponseEntity.ok(new LoginResponseDTO(token));
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping
@@ -68,7 +71,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}/tasks")
-    public ResponseEntity loadTasksByUser(@PathVariable Long userId){
-        return ResponseEntity.ok().body(taskService.loadTasksByUserId(userId));
+    public ResponseEntity<List<TaskDTO>> loadTasksByUser(@PathVariable Long userId){
+        return ResponseEntity.ok().body(taskService.listTasks(userId));
     }
 }

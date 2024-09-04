@@ -1,5 +1,6 @@
 package com.teste.selaz.entity;
 
+import com.teste.selaz.dto.UserDTO;
 import com.teste.selaz.enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,16 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public User(Long id, String username, Role role) {
+        this.id = id;
+        this.username = username;
+        this.role = role;
+    }
+
+    public UserDTO toDTO (User user){
+        return new UserDTO(user.getId(), user.getUsername(), user.getRole());
     }
 
 

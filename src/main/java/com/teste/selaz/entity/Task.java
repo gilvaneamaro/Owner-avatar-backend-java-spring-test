@@ -1,5 +1,6 @@
 package com.teste.selaz.entity;
 
+import com.teste.selaz.dto.TaskDTO;
 import com.teste.selaz.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -33,5 +34,13 @@ public class Task {
         this.createAt = LocalDateTime.now();
         this.dueDate = dueDate;
         this.status = status;
+    }
+    public TaskDTO toDTO(Task task) {
+        return new TaskDTO( task.getId(),
+                            task.getTitle(),
+                            task.getDescription(),
+                            task.getDueDate(),
+                            task.getStatus(),
+                            task.getUser().getId());
     }
 }

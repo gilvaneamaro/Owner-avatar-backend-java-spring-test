@@ -1,5 +1,6 @@
 package com.teste.selaz.dto;
 
+import com.teste.selaz.entity.User;
 import com.teste.selaz.enums.Status;
 
 import java.time.LocalDateTime;
