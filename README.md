@@ -36,60 +36,68 @@ Desenvolver uma aplicação de gerenciamento de tarefas (todo list) com as segui
 ## Instruções para executar
 
 ### Requisitos para testes:
-- Java SDK 22.
-- Maven ([clique aqui](https://dicasdeprogramacao.com.br/como-instalar-o-maven-no-windows/) para instalar)
-- [Postman](https://www.postman.com/downloads/) (ou alguma ferramenta para testar endpoints)
+- [Java SDK 22](https://www.oracle.com/br/java/technologies/downloads/);
+- [Maven](https://dicasdeprogramacao.com.br/como-instalar-o-maven-no-windows/);
+- [Postman](https://www.postman.com/downloads/) (ou alguma ferramenta para testar endpoints).
 
 ### Após iniciar o projeto, documentação dos endpoints pelo Swagger estará disponível pelo [link](http://localhost:8080/swagger-ui/index.html):
 
 ### 1. Clone o repositório e acesse o diretório:
-    ```bash
-    git clone https://github.com/ManagerThalles/backend-java-spring-test.git
-    cd backend-java-spring-boot-test
-    ```
+```
+git clone https://github.com/gilvaneamaro/backend-java-spring-test.git
+```
+Acesse o diretório
+```
+cd backend-java-spring-boot-test
+```
 
-### 2. Execute o comando:
-    ```bash
-    mvn spring-boot:run
-    ```
+### 2. Execute o comando para compilar e executar os testes unitários:
+Compilando:
+```
+mvn clean install
+```
+Iniciando projeto:
+   ```
+   mvn spring-boot:run
+   ```
 
 ### 3. Reproduza as requisições através do Postman:
 ### Gerenciamento de usuários
    #### Para criar um novo usuário, realize uma requisição do tipo POST na seguinte URL:
-    ```bash
-      http://localhost:8080/api/users
-    ```
+   ```
+   http://localhost:8080/api/users
+   ```
    #### O body da requisição deve seguir o seguinte modelo:
-```bash
-{
-  "username":"gilvaneamaro",
-  "password":"123456",
-  "role":"ADMIN"
-}
-```
+   ```
+   {
+     "username":"gilvaneamaro",
+     "password":"123456",
+     "role":"ADMIN"
+   }
+   ```
 #### Para realizar o login, basta enviar uma requisição do tipo POST para a seguinte URL:
- ```bash
-http://localhost:8080/api/users/login
-```
+   ```
+   http://localhost:8080/api/users/login
+   ```
 Body da requisição:
-```bash
-{
-  "username":"gilvaneamaro",
-  "password":"123456",
-}
- ```
+   ```
+   {
+     "username":"gilvaneamaro",
+     "password":"123456",
+   }
+   ```
    Observação: será retornado um  **Bearer token** de autenticação, que será necessário para as demais requisições.
    
 #### Para listar os usuários cadastrados, basta enviar requisição do tipo GET
- ```bash
-http://localhost:8080/api/users
-```
+ ```
+ http://localhost:8080/api/users
+ ```
 #### Para atualizar o cadastro de um usuário, envie requisição do tipo PUT:
- ```bash
+```
 http://localhost:8080/api/users
 ```
 Body da requisição:
-```bash
+```
 {
   "username":"gilvaneamaro",
   "password":"123456",
@@ -99,16 +107,16 @@ Body da requisição:
 É possível atualizar o nome, senha e a role do usuário.
 
 #### Para deletar um usuário, envie requisição do tipo DELETE com o id do usuário na URL:
- ```bash
+```
 http://localhost:8080/api/users/1
 ```
 ### Gerenciamento de tarefas
 #### Para criar uma nova tarefa, envie requisição do tipo POST:
- ```bash
+```
 http://localhost:8080/api/tasks
 ```
 Body da requisição:
-```bash
+```
 {
   "title": "Preparação para o primeiro dia na Selaz",
   "description": "Tomar água, respirar fundo e fazer diferença!",
@@ -117,19 +125,19 @@ Body da requisição:
   "status": "EM_ANDAMENTO",
   "userID":"1"
 }
- ```
+```
 #### Para listar todas as tarefas de um usuário autenticado requisição do tipo GET:
- ```bash
+```
 http://localhost:8080/api/tasks
 ```
 Será retornado todos as tasks relacionadas ao usuário do token utilizado.
 
 #### Para atualizar uma tarefa existente, envie uma requisição do tipo PUT com o id:
- ```bash
+```
 http://localhost:8080/api/tasks/{id}
 ```
 Body da requisição:
-```bash
+```
 {
   "title": "Preparação para o primeiro dia na Selaz",
   "description": "Tomar água, respirar fundo e fazer diferença!",
@@ -140,21 +148,21 @@ Body da requisição:
 É possível atualizar apenas um item, se desejado.
 
 #### Para deletar uma nova tarefa, envie requisição do tipo DELETE com o id:
- ```bash
+```
 http://localhost:8080/api/tasks/{id}
 ```
 
 #### Para filtrar tarefas por status, passe o parâmetro pela URL e uma requisição do tipo GET:
- ```bash
+```
 http://localhost:8080/api/tasks?status=CONCLUIDA
 ```
 
 #### Para ordenar as tarefas por data de vencimento, passe o parâmetro pela URL e uma requisição do tipo GET::
- ```bash
+```
 http://localhost:8080/api/tasks?sort=duedate
 ```
 #### Para listar todas as tarefas de um usuário específico, passe o ID pela URL em uma requisição do tipo GET::
- ```bash
+```
 http://localhost:8080/api/users/{userID}/tasks
 ```
 
