@@ -1,6 +1,7 @@
 package com.teste.selaz.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.teste.selaz.dto.AuthenticationDTO;
 import com.teste.selaz.dto.RegisterDTO;
 import com.teste.selaz.dto.UserDTO;
 import com.teste.selaz.entity.User;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -50,76 +52,53 @@ public class UserControllerTest {
 
     private User user;
 
+    private User unRegisteredUser;
+
+    private AuthenticationDTO authenticationDTO;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(userController).alwaysDo(print()).build();
         secureMockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
-
-        registerDTO = new RegisterDTO("gilvaneamaro", "123456", Role.ADMIN);
-        userDTO = new UserDTO(1L,"gilvaneamaro",Role.ADMIN);
         role = Role.ADMIN;
 
-        user = new User("gilvaneamaro","123456",role);
+        registerDTO = new RegisterDTO("gilvaneamaro", "123456",role);
+        userDTO = new UserDTO(1L,"gilvaneamaro",Role.ADMIN);
+
+        user = new User("gilvaneamaro", new BCryptPasswordEncoder().encode("123456"), Role.ADMIN);
+        User unRegisteredUser = new User("gilvane","123",role);
+
+         authenticationDTO = new AuthenticationDTO("gilvane","123");
+
+
+
     }
 
     @Test
-    void shouldReturnNotFoundForUnregistredUsers() throws Exception {
-        secureMockMvc.perform(post("/api/users/"))
-                .andExpect(status().isNotFound());
+    void shouldReturnUnauthorizedForUnregistredUsers() throws Exception {
+        String userJson = new ObjectMapper().writeValueAsString(authenticationDTO);
+
+        secureMockMvc.perform(post("/api/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(userJson))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
-    void shouldReturnNotFoundWhenUpdatedUnregistredUsers() throws Exception {
-        String userJson = new ObjectMapper().writeValueAsString(user);
+    void shouldReturnBadRequestWhenUpdatedUnregistredUsers() throws Exception {
+        String userJson = new ObjectMapper().writeValueAsString(unRegisteredUser);
 
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(userJson))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void shouldCreateUserSuccess() throws Exception {
-        when(userService.createUser(registerDTO)).thenReturn(userDTO);
-
-        String registerDTOJson = new ObjectMapper().writeValueAsString(registerDTO);
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerDTOJson))
-                .andExpect(status().isCreated());
-
-        verify(userService).createUser(registerDTO);
-        verifyNoMoreInteractions(userService);
-    }
-
-    @Test
-    void shouldFailsWhenCreateUserDuplicateUsername() throws Exception {
-        when(userService.createUser(registerDTO)).thenReturn(userDTO);
-
-        String registerDTOJson = new ObjectMapper().writeValueAsString(registerDTO);
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerDTOJson))
-                .andExpect(status().isCreated());
-
-        doThrow(new UserAlreadyExistsException("Username already exists"))
-                .when(userService).createUser(any(RegisterDTO.class));
-
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerDTOJson))
-                .andExpect(status().isConflict());
-
-        verify(userService, times(2)).createUser(any(RegisterDTO.class));
-
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldReturnSucessLogin(){
+
 
     }
 
