@@ -67,7 +67,6 @@ public class UserService {
             if(userRepository.findByUsername(updatedUser.getUsername()) != null){
                 throw new UserAlreadyExistsException("Username already exists");
             }
-
             user.setUsername(updatedUser.getUsername());
         }
         if (updatedUser.getRole() != null && !updatedUser.getRole().equals(user.getRole())) {

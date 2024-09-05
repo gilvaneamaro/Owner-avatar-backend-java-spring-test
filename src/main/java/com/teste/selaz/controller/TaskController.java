@@ -45,6 +45,8 @@ public class TaskController {
                             content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = TaskDTO.class)))),
                     @ApiResponse(responseCode = "400", description = "Parâmetros inválidos.",
                             content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
+                            content = @Content(mediaType = "application/json")),
             }
     )
     @GetMapping
@@ -65,6 +67,8 @@ public class TaskController {
                             content = @Content(mediaType = "application/json")),
                     @ApiResponse(responseCode = "400", description = "Data de vencimento não pode ser antes da data atual.",
                             content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
+                            content = @Content(mediaType = "application/json")),
             }
     )
     @PostMapping
@@ -80,6 +84,8 @@ public class TaskController {
                     @ApiResponse(responseCode = "200", description = "Task atualizada com sucesso.",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Usuário/task não cadastrado.",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
                             content = @Content(mediaType = "application/json")),
             }
     )
@@ -98,6 +104,8 @@ public class TaskController {
                     @ApiResponse(responseCode = "200", description = "Task deletada com sucesso.",
                             content = @Content(mediaType = "application/json")),
                     @ApiResponse(responseCode = "404", description = "Task não encontrada.",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
                             content = @Content(mediaType = "application/json")),
             }
     )

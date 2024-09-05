@@ -43,7 +43,11 @@ public class UserController {
             description = "Retorna um array de objetos User, vazio no caso de não existir usuários",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuários encontrados com sucesso",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = UserDTO.class))))
+                            content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = UserDTO.class)))                    ),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "404", description = "Usuário não encontrado.",
+                            content = @Content(mediaType = "application/json")),
             }
     )
     @GetMapping
@@ -61,6 +65,8 @@ public class UserController {
                             content = @Content(mediaType = "application/json")),
                     @ApiResponse(responseCode = "409", description = "Já existe um outro usuário com o mesmo username.",
                             content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
+                            content = @Content(mediaType = "application/json")),
             }
     )
     @PutMapping(value = "/{id}")
@@ -75,6 +81,8 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "Usuário deletado com sucesso.",
                             content = @Content(mediaType = "application/json")),
                     @ApiResponse(responseCode = "404", description = "Usuário não encontrado.",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
                             content = @Content(mediaType = "application/json")),
             }
     )
@@ -91,6 +99,7 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = LoginResponseDTO.class))),
                     @ApiResponse(responseCode = "401", description = "Credenciais inválidas.",
                             content = @Content(mediaType = "application/json")),
+
             }
     )
     @PostMapping("/login")
@@ -107,6 +116,8 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
                     @ApiResponse(responseCode = "400", description = "Já existe um usuário com o mesmo username.",
                             content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
+                            content = @Content(mediaType = "application/json")),
             }
     )
     @PostMapping
@@ -121,6 +132,8 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "Lista encontrada com sucesso.",
                             content = @Content(mediaType = "application/json", array = @ArraySchema( schema = @Schema(implementation = TaskDTO.class)))),
                     @ApiResponse(responseCode = "404", description = "Usuário não encontrado.",
+                            content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "401", description = "Token expirado, usuário sem credencial.",
                             content = @Content(mediaType = "application/json")),
             }
     )
