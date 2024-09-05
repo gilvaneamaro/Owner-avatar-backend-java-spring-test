@@ -4,6 +4,7 @@ import com.teste.selaz.dto.*;
 import com.teste.selaz.entity.Task;
 import com.teste.selaz.entity.User;
 import com.teste.selaz.exception.EntityNotFoundException;
+import com.teste.selaz.exception.InvalidCredentialsException;
 import com.teste.selaz.exception.UserAlreadyExistsException;
 import com.teste.selaz.repository.UserRepository;
 import com.teste.selaz.security.TokenService;
@@ -37,20 +38,15 @@ public class UserService {
     private AuthenticationManager authenticationManager;
 
     public UserDTO createUser(RegisterDTO user) {
-        try {
-            notNull(user, "User must not be null");
+        if (this.userRepository.findByUsername(user.username()) != null)
+            throw new UserAlreadyExistsException("Username already exists");
 
-            if (this.userRepository.findByUsername(user.username()) != null)
-                throw new UserAlreadyExistsException("Username already exists");
+        String encryptedPassword = new BCryptPasswordEncoder().encode(user.password());
+        User newUser = new User(user.username(), encryptedPassword, user.role());
 
-            String encryptedPassword = new BCryptPasswordEncoder().encode(user.password());
-            User newUser = new User(user.username(), encryptedPassword, user.role());
+        userRepository.save(newUser);
+        return newUser.toDTO(newUser);
 
-            userRepository.save(newUser);
-            return newUser.toDTO(newUser);
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating user", e);
-        }
     }
 
     public List<UserDTO> listUsers() {
@@ -61,27 +57,17 @@ public class UserService {
         }
         return userDTOList;
     }
-/*
-    @Transactional
-    public UserDTO updateUser(Long id, User updatedUser) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
 
-        if (updatedUser.getUsername() != null)
-            user.setUsername(updatedUser.getUsername());
-        if (updatedUser.getRole() != null)
-            user.setRole(updatedUser.getRole());
-        if (updatedUser.getPassword() != null) {
-            user.setPassword(new BCryptPasswordEncoder().encode(updatedUser.getPassword()));
-        }
-        return user.toDTO(user);
-    }*/
     @Transactional
     public UserDTO updateUser(Long id, User updatedUser) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
 
         if (updatedUser.getUsername() != null && !updatedUser.getUsername().equals(user.getUsername())) {
+            if(userRepository.findByUsername(updatedUser.getUsername()) != null){
+                throw new UserAlreadyExistsException("Username already exists");
+            }
+
             user.setUsername(updatedUser.getUsername());
         }
         if (updatedUser.getRole() != null && !updatedUser.getRole().equals(user.getRole())) {
@@ -131,7 +117,7 @@ public class UserService {
 
     public User findUserByID(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("User with id " + id + " not found."));
     }
 
     public UserDTO updatePassword(Long userId, String newPassword) {

@@ -1,13 +1,10 @@
 package com.teste.selaz.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teste.selaz.dto.RegisterDTO;
 import com.teste.selaz.dto.UserDTO;
 import com.teste.selaz.entity.User;
 import com.teste.selaz.enums.Role;
 import com.teste.selaz.exception.EntityNotFoundException;
-import com.teste.selaz.exception.UserAlreadyExistsException;
-import com.teste.selaz.repository.TaskRepository;
 import com.teste.selaz.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,9 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 import java.util.Optional;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -50,10 +45,8 @@ public class UserServiceTest {
         MockitoAnnotations.openMocks(this);
 
         registerDTO = new RegisterDTO("gilvaneamaro", "123456", Role.ADMIN);
-        user = new User("gilvaneamaro", new BCryptPasswordEncoder().encode("123456"), Role.ADMIN);
-        user.setId(1L);
+        user = new User(1L,"gilvaneamaro", new BCryptPasswordEncoder().encode("123456"), Role.ADMIN);
         userDTO = new UserDTO(1L, "gilvaneamaro", Role.ADMIN);
-
     }
 
     @Test
@@ -115,7 +108,7 @@ public class UserServiceTest {
             userService.createUser(registerDTO);
         });
 
-        assertEquals("Error creating user", exception.getMessage());
+        assertEquals("Username already exists", exception.getMessage());
 
         verify(userRepository, never()).save(any(User.class));
     }

@@ -26,14 +26,25 @@ public class SecurityFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        var token = this.recoverToken(request);
-        if(token != null) {
-            var username = tokenService.validateToken(token);
-            UserDetails user = userRepository.findByUsername(username);
-            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+        try {
+            var token = this.recoverToken(request);
+            if (token != null) {
+                var username = tokenService.validateToken(token);
+                UserDetails user = userRepository.findByUsername(username);
+                if (user == null) {
+                    throw new EntityNotFoundException("User not found");
+                }
+                var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+
         filterChain.doFilter(request, response);
+    }
+        catch (EntityNotFoundException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Invalid credentials");
+            response.getWriter().flush();
+        }
     }
 
     private String recoverToken (HttpServletRequest request){

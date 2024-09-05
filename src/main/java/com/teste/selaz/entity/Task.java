@@ -35,7 +35,7 @@ public class Task {
         this.dueDate = dueDate;
         this.status = status;
     }
-    public TaskDTO toDTO(Task task) {
+    public static TaskDTO toDTO(Task task) {
         return new TaskDTO( task.getId(),
                             task.getTitle(),
                             task.getDescription(),

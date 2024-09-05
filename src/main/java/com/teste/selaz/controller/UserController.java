@@ -30,16 +30,11 @@ import java.util.List;
 @Slf4j
 public class UserController {
     @Autowired
-    UserService usuarioService;
-
-    @Autowired
     TokenService tokenService;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
     private TaskService taskService;
+
     @Autowired
     private UserService userService;
 
@@ -53,7 +48,7 @@ public class UserController {
     )
     @GetMapping
     public ResponseEntity<List<UserDTO>> loadUsers(){
-        return ResponseEntity.status(HttpStatus.OK).body(usuarioService.listUsers());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.listUsers());
     }
 
     @Operation(
@@ -64,16 +59,13 @@ public class UserController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
                     @ApiResponse(responseCode = "404", description = "Usuário não encontrado.",
                             content = @Content(mediaType = "application/json")),
+                    @ApiResponse(responseCode = "409", description = "Já existe um outro usuário com o mesmo username.",
+                            content = @Content(mediaType = "application/json")),
             }
     )
     @PutMapping(value = "/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) throws Exception {
-        try{
-            return ResponseEntity.status(HttpStatus.OK).body(usuarioService.updateUser(id, user));
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(id, user));
     }
 
     @Operation(
@@ -88,13 +80,7 @@ public class UserController {
     )
     @DeleteMapping(value = "/{id}")
     public ResponseEntity deleteUser(@PathVariable Long id){
-        try {
-            usuarioService.deleteUser(id);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }
-        catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+            return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
     }
 
     @Operation(
@@ -109,12 +95,8 @@ public class UserController {
     )
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(usuarioService.login(data));
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        return ResponseEntity.status(HttpStatus.OK).body(userService.login(data));
+
     }
 
     @Operation(
@@ -129,14 +111,7 @@ public class UserController {
     )
     @PostMapping
     public ResponseEntity<UserDTO> register(@RequestBody @Valid RegisterDTO user) {
-        try {
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.createUser(user));
-        }
-        catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(user));
     }
 
     @Operation(
@@ -151,11 +126,7 @@ public class UserController {
     )
     @GetMapping(value = "/{userId}/tasks")
     public ResponseEntity<List<TaskDTO>> loadTasksByUser(@PathVariable @Valid Long userId) {
-        try {
-            UserDTO userDTO = userService.findByID(userId);
-            return ResponseEntity.ok().body(taskService.listTasks(userId));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        userService.findByID(userId);
+        return ResponseEntity.ok().body(taskService.listTasks(userId));
     }
 }

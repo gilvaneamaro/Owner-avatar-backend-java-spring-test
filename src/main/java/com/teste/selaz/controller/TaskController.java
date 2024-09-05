@@ -51,26 +51,8 @@ public class TaskController {
     public ResponseEntity<List<TaskDTO>> getAllTasks(@AuthenticationPrincipal UserDetails userDetails,
                                                   @RequestParam(value = "status", required = false) Status status,
                                                   @RequestParam(value = "sort", required = false) String sort) {
-        try {
-
-            Long userId = userService.findIdByUsername(userDetails.getUsername());
-
-            if (status == null && sort == null) {
-                return ResponseEntity.status(HttpStatus.OK).body(taskService.listTasks(userId));
-            }
-
-            if (sort != null && sort.equalsIgnoreCase("DUEDATE")) {
-                return ResponseEntity.ok().body(taskService.loadTasksByDueDate(userId));
-            }
-
-            if (status.equals(Status.CONCLUIDA) || status.equals(Status.PENDENTE) || status.equals(Status.EM_ANDAMENTO)) {
-                return ResponseEntity.ok().body(taskService.loadTasksByStatus(userId, status));
-            }
-            throw new InvalidDueDateException("Due date invalido");
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+                Long userId = userService.findIdByUsername(userDetails.getUsername());
+        return ResponseEntity.ok().body(taskService.list(sort, status, userId));
     }
 
     @Operation(
@@ -87,18 +69,8 @@ public class TaskController {
     )
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(@RequestBody TaskCreateDTO task) {
-        try {
-            User user =userService.findUserByID(task.userID());
-
+            User user = userService.findUserByID(task.userID());
             return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(task, user));
-        }
-        catch (EntityNotFoundException e){
-            return ResponseEntity.notFound().build();
-        }
-        catch (InvalidDueDateException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
     }
 
     @Operation(
@@ -113,13 +85,10 @@ public class TaskController {
     )
     @PutMapping(value="/{id}")
     public ResponseEntity<TaskDTO> updateTask(@RequestBody Task task, @PathVariable long id) {
-        try {
-            userService.findByID(task.getUser().getId());
-            return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(id, task));
-        }
-        catch (Exception e){
-            return ResponseEntity.badRequest().build();
-        }
+
+        userService.findByID(task.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(taskService.updateTask(id, task));
+
     }
 
     @Operation(
